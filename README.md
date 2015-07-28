@@ -7,7 +7,7 @@ Festival of Code 2015 YRS
 	<head>
 		<title>game 1</title>
 	</head>
-	<body><h1>Hiperspac</h1>
+	<body><h1>Hiperspace</h1>
 		<p><a href="">start</a></p>
 		<p><a href="">help</a></p>
 		

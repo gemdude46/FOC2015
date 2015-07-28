@@ -77,11 +77,11 @@ def getsid():
 
 @app.route("/game/")
 def game():
-    """
+    return """
     
     
     
-    <head><title>"""+request.args.get("usr")+"""
+    <head><title>"""+request.args.get("usr")+"""</title>
 <style>
 html, body {
     width:  100%;
@@ -93,6 +93,7 @@ html, body {
 <body>
 <canvas id=c>
 </canvas>
+<img src="../static/ship1.png" id=ship1 style=position:absolute;top:0px;>
 <script>
 
 var c = document.getElementById("c");
@@ -104,6 +105,7 @@ function draw() {
     ctx.rect(0,0,window.innerWidth,window.innerHeight);
     ctx.fillStyle="black";
     ctx.fill();
+    ctx.drawImage(document.getElementById("ship1"),window.innerWidth/2-32,window.innerHeight/2-32);
 }
 
 setInterval(draw,50);

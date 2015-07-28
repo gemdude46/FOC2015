@@ -5,9 +5,9 @@ Festival of Code 2015 YRS
 
 <html>
 	<head>
-		<title>game 1</title>
+		<title></title>
 	</head>
-	<body><h1>Hyperspace</h1>
+	<body><h1></h1>
 		<p><a href="">load</a></p>
 		<p><a href="">new</a></p>
 		<p><a href="">help</a></p>

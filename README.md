@@ -7,7 +7,7 @@ Festival of Code 2015 YRS
 	<head>
 		<title></title>
 	</head>
-	<body><h1></h1>
+	<body><h1>HYPERSPACE</h1>
 		<p><a href="">start</a></p>
 		<p><a href="">help</a></p>
 		

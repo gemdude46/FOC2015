@@ -1,4 +1,28 @@
 <head>
+<style>
+html, body {
+    width:  100%;
+    height: 100%;
+    margin: 0px;
+}
+</style>
 </head>
 <body>
+<canvas id=c>
+</canvas>
+<script>
+
+var c = document.getElementById("c");
+var ctx = c.getContext("2d");
+
+function draw() {
+    ctx.canvas.width  = window.innerWidth;
+    ctx.canvas.height = window.innerHeight;
+    ctx.rect(0,0,window.innerWidth,window.innerHeight);
+    ctx.fillStyle="black";
+    ctx.fill();
+}
+
+setInterval(draw,50);
+</script>
 </body>

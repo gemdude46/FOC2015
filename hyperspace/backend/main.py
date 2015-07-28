@@ -1,6 +1,14 @@
 from flask import Flask
 from flask import request
-app = Flask(__name__)
+class MyServer(Flask):
+
+    def __init__(self, *args, **kwargs):
+            super(MyServer, self).__init__(*args, **kwargs)
+
+            #instanciate your variables here
+            self.v = {}
+
+app = MyServer(__name__)
 
 @app.route("/")
 def index():

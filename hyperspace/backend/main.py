@@ -25,10 +25,11 @@ class User:
         self.dosh=10000
         self.fuel=1000
         self.eng=1000000
-        self.x=0
+        self.x=149597971700
         self.y=0
         self.ship=0
-        self.dest=(0,0)
+        self.dest=(149597971700,0)
+        self.warp=0
     
 def newuser(u,p):
     return User(u,hashlib.sha224(u+":"+p).hexdigest())
@@ -103,7 +104,17 @@ def setdst():
     return ""
 
 
-
+@app.route("/planets/")
+def getplanets():
+    
+    try:
+        s=""
+        for planet in app.v["planets"]:
+            s += " "+str(sin(planet.t)*planet.a)+"|"+str(cos(planet.t)*planet.a)+"|"+planet.file
+        
+        return s
+    except:
+        easygui.exceptionbox()
 app.v["planets_j"] = json.loads(open("planets.json","r").read())
 
 app.v["planets"] = [Planet(1,pi/2,"images/earth.png")]

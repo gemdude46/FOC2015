@@ -8,7 +8,7 @@ class Station:
         self.x=x
         self.y=y
 
-stations = [Station(-300,0)]
+stations = [Station(149597971700-300,0)]
 
 ip="http://localhost:5000"
 
@@ -19,11 +19,20 @@ eng=10
 ship=0
 pos=(0,0)
 
+
+
+def getimg(img):
+    try:
+        return imgs[img]
+    except KeyError:
+        imgs[img]=pygame.image.load(img).convert_alpha()
+        return getimg(img)
+
 theta=math.pi
 
 def updateData():
     global hp,dosh,fuel,eng,ship,pos,cursor
-    d = urllib.urlopen(ip+"/data/?username="+login[0]).read().split()
+    d = urllib.urlopen(ip+"/data/?username="+login[0]+"&space="+str(kp[K_SPACE])+"&t="+str(theta)).read().split()
     #print d
     hp=int(d[0])
     dosh=int(d[1])
@@ -51,27 +60,51 @@ try:
     bolt=pygame.image.load("images/energy.png").convert_alpha()
     cs=pygame.image.load("images/cursor.png").convert_alpha()
     
+    imgs={"images/earth.png":pygame.transform.scale(pygame.image.load("images/earth.png").convert_alpha(),(256,256))}
+    
     ships_i=[pygame.image.load("images/ship1.png").convert_alpha()]
     
     stations_i=[pygame.transform.scale(pygame.image.load("images/station1.png").convert_alpha(),(256,256))]
     
+    _P=urllib.urlopen(ip+"/planets/").read().split()
+    for i in xrange(len(_P)):
+        _P[i]=_P[i].split("|")
+    
+    #print _P
+    
+    
     rotship=pygame.transform.rotate(ships_i[ship],math.degrees(theta+math.pi))
     
     while True:
-        
+        kp = pygame.key.get_pressed()
         updateData()
         #print cursor
         for event in pygame.event.get():
             if event.type == QUIT:
                 raise KeyboardInterrupt
             if event.type == MOUSEBUTTONDOWN and event.button == 1 and event.pos[1] < 1164:
-                urllib.urlopen(ip+"/setdst/?username="+login[0]+"&rpos="+str(event.pos[0]-600)+"_"+str(event.pos[1]-(768/2)))
+                urllib.urlopen(ip+"/setdst/?username="+login[0]+"&rpos="+str(event.pos[0]-600)+"_"+str(event.pos[1]-768/2))
                 theta=math.atan2(event.pos[0]-600,event.pos[1]-(768/2))
                 cursor=event.pos
-        kp = pygame.key.get_pressed()
+        
         if kp[K_q]:
             sys.exit()
+            
+        if kp[K_RIGHT]:
+            theta+=0.001
+        if kp[K_LEFT]:
+            theta-=0.001
+            
+            
         screen.fill((0,0,0))
+        
+        for planet in _P:
+            _Pp = (int((float(planet[0])*149597870700-pos[0])/50000+600),
+            int((float(planet[1])*149597870700-pos[1])/50000+768/2))
+            if _Pp[0]**2+_Pp[1]**2 < 25000000:
+                screen.blit(getimg(planet[2]),_Pp)
+            #print _Pp
+        
         screen.blit(heart,(5,5))
         pygame.draw.line(screen,(255,0,0),(32,14),(32+(hp*4),14),2)
         screen.blit(bolt,(5,26))
@@ -81,7 +114,8 @@ try:
         screen.blit(rotship,(600-rotship.get_width()/2,(768/2)-rotship.get_height()/2))
         
         for station in stations:
-            screen.blit(stations_i[0],(station.x-pos[0]+600,station.y-pos[1]+(768/2)))
+            if (station.x-pos[0])**2+(station.y-pos[1]+(768/2))**2 < 25000000:
+                screen.blit(stations_i[0],(station.x-pos[0]+600,station.y-pos[1]+(768/2)))
         
         if (cursor[0]-600)**2+(cursor[1]-(768/2))**2 > 32:
             screen.blit(cs,(cursor[0]-8,cursor[1]-8))

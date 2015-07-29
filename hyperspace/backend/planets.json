@@ -1,0 +1,66 @@
+[
+{
+"name": "Mercury",
+"radius": 2439.7,
+"mass": 0.330104,
+"a": 58.6462,
+"Equatorial Gravity":3.70
+},
+{
+"name": "Venus",
+"radius": 6051.8,
+"mass": 4.86732,
+"a": 0.61519726,
+"Equatorial Gravity": 8.87  	
+},
+{
+"name": "Earth",
+"radius": 6371.00,
+"mass": 5.97219,
+"a": 0.99726968,
+"Equatorial Gravity": 9.80
+},
+{
+"name": "Mars",
+"radius": 3396.19,
+"mass": 0.641693,
+"a": 3389.50,
+"Equatorial Gravity": 3.71  
+},
+{
+"name": "Jupiter",
+"radius" : 71492,
+"mass": 1898.13,
+"a": 0.41354,
+"Equatorial Gravity": 24.79
+},
+{
+"name": "saturn",
+"radius": 58232,
+"mass": 568.319,
+"a": 0.44401,
+"Equatorial Gravity": 10.44
+},
+{
+"name": "Uranus",
+"radius": 25362,
+"mass": 86.8103,
+"a": -0.71833,
+"Equatorial Gravity": 8.87
+},
+{
+"name": "Neptune",
+"radius": 24622,
+"mass": 102.410,
+"a": 0.67125,
+"Equatorial Gravity": 11.15
+},
+{
+"name": "Pluto",
+"radius": 1151,
+"mass": 1309,
+"a": -6.3872,
+"Equatorial Gravity": 0.66
+}
+]
+

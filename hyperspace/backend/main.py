@@ -1,7 +1,8 @@
 from flask import Flask
 from flask import request
 from flask import redirect
-import hashlib, os, easygui
+from math import *
+import hashlib, os, easygui, json
 class MyServer(Flask):
 
     def __init__(self, *args, **kwargs):
@@ -9,6 +10,12 @@ class MyServer(Flask):
 
             #instanciate your variables here
             self.v = {"users":{"test":User("test","")}}
+
+class Planet:
+    def __init__(self,a,t,f):
+        self.a = a
+        self.t = t
+        self.file = f
 
 class User:
     def __init__(self,user,pswd):
@@ -18,6 +25,10 @@ class User:
         self.dosh=10000
         self.fuel=1000
         self.eng=1000000
+        self.x=0
+        self.y=0
+        self.ship=0
+        self.dest=(0,0)
     
 def newuser(u,p):
     return User(u,hashlib.sha224(u+":"+p).hexdigest())
@@ -40,18 +51,62 @@ def index():
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+def update():
+    #try:
+    for user in app.v["users"].values():
+        #print user.dest
+        if (user.x-user.dest[0])**2+(user.y-user.dest[1])**2 > 25:
+            user.x+=int(sin(atan2(user.dest[0]-user.x,user.dest[1]-user.y))*5)
+            user.y+=int(cos(atan2(user.dest[0]-user.x,user.dest[1]-user.y))*5)
+    
+
 @app.route("/data/")
 def data():
+    
     try:
+        update()
         u=request.args.get("username")
-        return str(app.v["users"][u].hp)+" "+str(app.v["users"][u].dosh)+" "+str(app.v["users"][u].fuel)+" "+str(app.v["users"][u].eng)
+        return str(app.v["users"][u].hp)+" "+str(app.v["users"][u].dosh)+" "+str(app.v["users"][u].fuel)+" "+str(app.v["users"][u].eng)+" "+str(app.v["users"][u].ship)+" "+str(app.v["users"][u].x)+" "+str(app.v["users"][u].y)
     except:
         easygui.exceptionbox()
 
 
+@app.route("/setdst/")
+def setdst():
+    u=request.args.get("username")
+    p=request.args.get("rpos").split("_")
+    app.v["users"][u].dest=(int(p[0])+app.v["users"][u].x,int(p[1])+app.v["users"][u].y)
+    return ""
 
 
 
+app.v["planets_j"] = json.loads(open("planets.json","r").read())
+
+app.v["planets"] = [Planet(1,pi/2,"images/earth.png")]
 
 
 

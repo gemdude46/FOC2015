@@ -1,19 +1,23 @@
 from flask import Flask
 from flask import request
 from flask import redirect
-import hashlib, os
+import hashlib, os, easygui
 class MyServer(Flask):
 
     def __init__(self, *args, **kwargs):
             super(MyServer, self).__init__(*args, **kwargs)
 
             #instanciate your variables here
-            self.v = {"users":[]}
+            self.v = {"users":{"test":User("test","")}}
 
 class User:
     def __init__(self,user,pswd):
         self.u=user
         self.p=pswd
+        self.hp=100
+        self.dosh=10000
+        self.fuel=1000
+        self.eng=1000000
     
 def newuser(u,p):
     return User(u,hashlib.sha224(u+":"+p).hexdigest())
@@ -36,8 +40,13 @@ def index():
 
 
 
-
-
+@app.route("/data/")
+def data():
+    try:
+        u=request.args.get("username")
+        return str(app.v["users"][u].hp)+" "+str(app.v["users"][u].dosh)+" "+str(app.v["users"][u].fuel)+" "+str(app.v["users"][u].eng)
+    except:
+        easygui.exceptionbox()
 
 
 

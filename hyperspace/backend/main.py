@@ -2,7 +2,7 @@ from flask import Flask
 from flask import request
 from flask import redirect
 from math import *
-import hashlib, os, easygui, json
+import os, easygui, json
 class MyServer(Flask):
 
     def __init__(self, *args, **kwargs):
@@ -29,7 +29,11 @@ class User:
         self.y=0
         self.ship=0
         self.dest=(149597971700,0)
-        self.warp=0
+    
+class Station:
+    def __init__(self,x,y):
+        self.x=x
+        self.y=y
     
 def newuser(u,p):
     return User(u,hashlib.sha224(u+":"+p).hexdigest())
@@ -89,8 +93,14 @@ def update():
 def data():
     
     try:
-        update()
         u=request.args.get("username")
+        
+        if request.args.get("space") == "1" and app.v["users"][u].eng >= 20:
+            app.v["users"][u].eng -= 20
+            t=float(request.args.get("t"))
+            app.v["users"][u].x+=int(sin(t)*200000)
+            app.v["users"][u].y+=int(cos(t)*200000)
+        update()
         return str(app.v["users"][u].hp)+" "+str(app.v["users"][u].dosh)+" "+str(app.v["users"][u].fuel)+" "+str(app.v["users"][u].eng)+" "+str(app.v["users"][u].ship)+" "+str(app.v["users"][u].x)+" "+str(app.v["users"][u].y)
     except:
         easygui.exceptionbox()
@@ -115,9 +125,24 @@ def getplanets():
         return s
     except:
         easygui.exceptionbox()
+        
+@app.route("/stations/")
+def getstations():
+    u=request.args.get("username")
+    s=""
+    x=int(app.v["users"][u].x)
+    y=int(app.v["users"][u].y)
+    for station in app.v["stations"]:
+        if ((station.x-x)**2 + (station.y-y)**2)**0.5 < 14959797170:
+            s+=" "+str(station.x)+"|"+str(station.y)
+    return s
+        
+        
+        
 app.v["planets_j"] = json.loads(open("planets.json","r").read())
 
 app.v["planets"] = [Planet(1,pi/2,"images/earth.png")]
+app.v["stations"] = [Station(149597971700-300,0)]
 
 
 

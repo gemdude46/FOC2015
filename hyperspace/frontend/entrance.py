@@ -1,4 +1,4 @@
-import pygame, sys, urllib, easygui, math
+import pygame, sys, urllib, easygui, math, time
 from pygame.locals import *
 
 
@@ -8,7 +8,7 @@ class Station:
         self.x=x
         self.y=y
 
-stations = [Station(149597971700-300,0)]
+stations = []
 
 ip="http://localhost:5000"
 
@@ -45,6 +45,7 @@ def updateData():
 
 
 
+last_d_time=0
 
 
 
@@ -76,6 +77,19 @@ try:
     rotship=pygame.transform.rotate(ships_i[ship],math.degrees(theta+math.pi))
     
     while True:
+    
+        if time.time()-last_d_time > 15:
+            _P=urllib.urlopen(ip+"/planets/").read().split()
+            for i in xrange(len(_P)):
+                _P[i]=_P[i].split("|")
+            _S=urllib.urlopen(ip+"/stations/?username="+login[0]).read().split()
+            
+            for i in xrange(len(_S)):
+                _S[i]=_S[i].split("|")
+                stations.append(Station(int(_S[i][0]),int(_S[i][1])))
+            last_d_time=time.time()
+    
+    
         kp = pygame.key.get_pressed()
         updateData()
         #print cursor
@@ -91,9 +105,11 @@ try:
             sys.exit()
             
         if kp[K_RIGHT]:
-            theta+=0.001
+            theta-=0.02
+            rotship=pygame.transform.rotate(ships_i[ship],math.degrees(theta+math.pi))
         if kp[K_LEFT]:
-            theta-=0.001
+            theta+=0.02
+            rotship=pygame.transform.rotate(ships_i[ship],math.degrees(theta+math.pi))
             
             
         screen.fill((0,0,0))

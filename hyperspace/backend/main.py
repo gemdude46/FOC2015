@@ -9,7 +9,7 @@ class MyServer(Flask):
             super(MyServer, self).__init__(*args, **kwargs)
 
             #instanciate your variables here
-            self.v = {"users":{"test":User("test","")}}
+            self.v = {"users":{"Alice":User("Alice",""),"Bob":User("Bob","")}}
 
 class Planet:
     def __init__(self,a,t,f,g,d,tmp,ts):
@@ -21,6 +21,11 @@ class Planet:
         self.tmp=tmp
         self.ts=ts
         self.s=ts
+    
+    def x(self):
+        return self.a*sin(self.t)
+    def y(self):
+        return self.a*cos(self.t)
 
 class User:
     def __init__(self,user,pswd):
@@ -123,7 +128,7 @@ def getplanets():
     try:
         s=""
         for planet in app.v["planets"]:
-            s += " "+str(sin(planet.t)*planet.a)+"|"+str(cos(planet.t)*planet.a)+"|"+planet.file+"|"+str(planet.g)+"|"+str(planet.d)+"|"+planet.tmp
+            s += " "+str(planet.x())+"|"+str(planet.y())+"|"+planet.file+"|"+str(planet.g)+"|"+str(planet.d)+"|"+planet.tmp
         
         return s
     except:
@@ -140,6 +145,21 @@ def getstations():
             s+=" "+str(station.x)+"|"+str(station.y)
     return s
         
+@app.route("/scan/")
+def scanplanet():
+    u=request.args.get("username")
+    p=int(request.args.get("pid"))
+    x=int(app.v["users"][u].x)
+    y=int(app.v["users"][u].y)
+    px=app.v["planets"][p].x()*149597870700
+    py=app.v["planets"][p].y()*149597870700
+    d=((x-px)**2+(y-py)**2)**0.5
+    if d > 30000000:
+        return ""
+    s = (1 - d / 30000000) * app.v["planets"][p].s / 2
+    app.v["planets"][p].s-=s
+    app.v["users"][u].dosh+=int(s)
+    
         
         
 app.v["planets_j"] = json.loads(open("planets.json","r").read())

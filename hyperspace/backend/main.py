@@ -12,10 +12,15 @@ class MyServer(Flask):
             self.v = {"users":{"test":User("test","")}}
 
 class Planet:
-    def __init__(self,a,t,f):
+    def __init__(self,a,t,f,g,d,tmp,ts):
         self.a = a
         self.t = t
         self.file = f
+        self.g=g
+        self.d=d
+        self.tmp=tmp
+        self.ts=ts
+        self.s=ts
 
 class User:
     def __init__(self,user,pswd):
@@ -92,19 +97,17 @@ def update():
 @app.route("/data/")
 def data():
     
-    try:
-        u=request.args.get("username")
+    
+    u=request.args.get("username")
         
-        if request.args.get("space") == "1" and app.v["users"][u].eng >= 20:
-            app.v["users"][u].eng -= 20
-            t=float(request.args.get("t"))
-            app.v["users"][u].x+=int(sin(t)*200000)
-            app.v["users"][u].y+=int(cos(t)*200000)
-        update()
-        return str(app.v["users"][u].hp)+" "+str(app.v["users"][u].dosh)+" "+str(app.v["users"][u].fuel)+" "+str(app.v["users"][u].eng)+" "+str(app.v["users"][u].ship)+" "+str(app.v["users"][u].x)+" "+str(app.v["users"][u].y)
-    except:
-        easygui.exceptionbox()
-
+    if request.args.get("space") == "1" and app.v["users"][u].eng >= 20:
+        app.v["users"][u].eng -= 20
+        t=float(request.args.get("t"))
+        app.v["users"][u].x+=int(sin(t)*200000)
+        app.v["users"][u].y+=int(cos(t)*200000)
+    update()
+    return str(app.v["users"][u].hp)+" "+str(app.v["users"][u].dosh)+" "+str(app.v["users"][u].fuel)+" "+str(app.v["users"][u].eng)+" "+str(app.v["users"][u].ship)+" "+str(app.v["users"][u].x)+" "+str(app.v["users"][u].y)
+    
 
 @app.route("/setdst/")
 def setdst():
@@ -120,7 +123,7 @@ def getplanets():
     try:
         s=""
         for planet in app.v["planets"]:
-            s += " "+str(sin(planet.t)*planet.a)+"|"+str(cos(planet.t)*planet.a)+"|"+planet.file
+            s += " "+str(sin(planet.t)*planet.a)+"|"+str(cos(planet.t)*planet.a)+"|"+planet.file+"|"+str(planet.g)+"|"+str(planet.d)+"|"+planet.tmp
         
         return s
     except:
@@ -141,7 +144,7 @@ def getstations():
         
 app.v["planets_j"] = json.loads(open("planets.json","r").read())
 
-app.v["planets"] = [Planet(1,pi/2,"images/earth.png")]
+app.v["planets"] = [Planet(1,pi/2,"images/earth.png",9.81,24,"hot",1000)]
 app.v["stations"] = [Station(149597971700-300,0)]
 
 

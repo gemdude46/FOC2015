@@ -1,7 +1,8 @@
 import pygame, sys, urllib, easygui, math, time
 from pygame.locals import *
+pygame.init()
 
-
+c_s = unichr(934)
 
 class Station:
     def __init__(self,x,y):
@@ -47,9 +48,10 @@ def updateData():
 
 last_d_time=0
 
-
+mpos=(0,0)
 
 try:
+    font=pygame.font.Font(None,16)
 
     login=easygui.multpasswordbox("Login","Hyperspace",["Username","Password"])
 
@@ -93,6 +95,7 @@ try:
         kp = pygame.key.get_pressed()
         updateData()
         #print cursor
+        rmb=False
         for event in pygame.event.get():
             if event.type == QUIT:
                 raise KeyboardInterrupt
@@ -100,6 +103,10 @@ try:
                 urllib.urlopen(ip+"/setdst/?username="+login[0]+"&rpos="+str(event.pos[0]-600)+"_"+str(event.pos[1]-768/2))
                 theta=math.atan2(event.pos[0]-600,event.pos[1]-(768/2))
                 cursor=event.pos
+            if event.type == MOUSEBUTTONDOWN and event.button == 2:
+                rmb=True
+            if event.type == MOUSEMOTION:
+                mpos=event.pos
         
         if kp[K_q]:
             sys.exit()
@@ -119,12 +126,15 @@ try:
             int((float(planet[1])*149597870700-pos[1])/50000+768/2))
             if _Pp[0]**2+_Pp[1]**2 < 25000000:
                 screen.blit(getimg(planet[2]),_Pp)
+                if rmb and (mpos[0]-(_Pp[0]+getimg(planet[2]).get_width()/2))**2 +(mpos[1]-(_Pp[1]+getimg(planet[2]).get_width()/2))**2 < (getimg(planet[2]).get_width()/2)**2:
+                    pass    
             #print _Pp
         
         screen.blit(heart,(5,5))
         pygame.draw.line(screen,(255,0,0),(32,14),(32+(hp*4),14),2)
         screen.blit(bolt,(5,26))
         pygame.draw.line(screen,(255,255,0),(32,34),(32+int(eng*4/10000.),34),2)
+        screen.blit(font.render(c_s+str(dosh),True,(255,255,255)),(5,47))
         
         
         screen.blit(rotship,(600-rotship.get_width()/2,(768/2)-rotship.get_height()/2))

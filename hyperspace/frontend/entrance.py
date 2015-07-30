@@ -133,7 +133,7 @@ try:
             if (station.x-pos[0])**2+(station.y-pos[1]+(768/2))**2 < 25000000:
                 screen.blit(stations_i[0],(station.x-pos[0]+600,station.y-pos[1]+(768/2)))
         
-        if (cursor[0]-600)**2+(cursor[1]-(768/2))**2 > 32:
+        if (cursor[0]-600)**2+(cursor[1]-(768/2))**2 > 32 and (cursor[0]-600)**2+(cursor[1]-(768/2))**2 < 1440000:
             screen.blit(cs,(cursor[0]-8,cursor[1]-8))
             rotship=pygame.transform.rotate(ships_i[ship],math.degrees(theta+math.pi))
         

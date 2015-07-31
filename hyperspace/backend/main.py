@@ -12,7 +12,7 @@ class MyServer(Flask):
             self.v = {"users":{"Alice":User("Alice",""),"Bob":User("Bob","")}}
 
 class Planet:
-    def __init__(self,a,t,f,g,d,tmp,ts):
+    def __init__(self,a,t,f,n,g,d,tmp,ts):
         self.a = a
         self.t = t
         self.file = f
@@ -21,6 +21,7 @@ class Planet:
         self.tmp=tmp
         self.ts=ts
         self.s=ts
+        self.name=n
     
     def x(self):
         return self.a*sin(self.t)
@@ -39,6 +40,8 @@ class User:
         self.y=0
         self.ship=0
         self.dest=(149597971700,0)
+        self.scan_cooldown=0
+        self.theta=0
     
 class Station:
     def __init__(self,x,y):
@@ -97,6 +100,7 @@ def update():
         if (user.x-user.dest[0])**2+(user.y-user.dest[1])**2 > 25:
             user.x+=int(sin(atan2(user.dest[0]-user.x,user.dest[1]-user.y))*5)
             user.y+=int(cos(atan2(user.dest[0]-user.x,user.dest[1]-user.y))*5)
+        user.scan_cooldown -= 1
     
 
 @app.route("/data/")
@@ -108,10 +112,15 @@ def data():
     if request.args.get("space") == "1" and app.v["users"][u].eng >= 20:
         app.v["users"][u].eng -= 20
         t=float(request.args.get("t"))
+        app.v["users"][u].theta=t
         app.v["users"][u].x+=int(sin(t)*200000)
         app.v["users"][u].y+=int(cos(t)*200000)
     update()
-    return str(app.v["users"][u].hp)+" "+str(app.v["users"][u].dosh)+" "+str(app.v["users"][u].fuel)+" "+str(app.v["users"][u].eng)+" "+str(app.v["users"][u].ship)+" "+str(app.v["users"][u].x)+" "+str(app.v["users"][u].y)
+    """us=""
+    for user in app.v["users"].values():
+        if user is not app.v["users"][u]:
+            us"""
+    return str(app.v["users"][u].hp)+" "+str(app.v["users"][u].dosh)+" "+str(app.v["users"][u].fuel)+" "+str(app.v["users"][u].eng)+" "+str(app.v["users"][u].ship)+" "+str(app.v["users"][u].x)+" "+str(app.v["users"][u].y)#+" "+us
     
 
 @app.route("/setdst/")
@@ -128,7 +137,7 @@ def getplanets():
     try:
         s=""
         for planet in app.v["planets"]:
-            s += " "+str(planet.x())+"|"+str(planet.y())+"|"+planet.file+"|"+str(planet.g)+"|"+str(planet.d)+"|"+planet.tmp
+            s += " "+str(planet.x())+"|"+str(planet.y())+"|"+planet.file+"|"+planet.name+"|"+str(planet.g)+"|"+str(planet.d)+"|"+planet.tmp
         
         return s
     except:
@@ -147,7 +156,11 @@ def getstations():
         
 @app.route("/scan/")
 def scanplanet():
+    
     u=request.args.get("username")
+    if app.v["users"][u].scan_cooldown > 0:
+        return ""
+    app.v["users"][u].scan_cooldown = 50
     p=int(request.args.get("pid"))
     x=int(app.v["users"][u].x)
     y=int(app.v["users"][u].y)
@@ -159,12 +172,14 @@ def scanplanet():
     s = (1 - d / 30000000) * app.v["planets"][p].s / 2
     app.v["planets"][p].s-=s
     app.v["users"][u].dosh+=int(s)
+    return ""
+    
     
         
         
 app.v["planets_j"] = json.loads(open("planets.json","r").read())
 
-app.v["planets"] = [Planet(1,pi/2,"images/earth.png",9.81,24,"hot",1000)]
+app.v["planets"] = [Planet(1,pi/2,"images/earth.png","Earth",9.81,24,"warm",1000)]
 app.v["stations"] = [Station(149597971700-300,0)]
 
 

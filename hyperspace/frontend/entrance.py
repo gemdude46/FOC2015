@@ -50,6 +50,10 @@ last_d_time=0
 
 mpos=(0,0)
 
+rcm="x"
+rcmp=(0,0)
+rcmh=0
+
 try:
     font=pygame.font.Font(None,16)
 
@@ -96,14 +100,17 @@ try:
         updateData()
         #print cursor
         rmb=False
+        lmb=False
         for event in pygame.event.get():
             if event.type == QUIT:
                 raise KeyboardInterrupt
             if event.type == MOUSEBUTTONDOWN and event.button == 1 and event.pos[1] < 1164:
-                urllib.urlopen(ip+"/setdst/?username="+login[0]+"&rpos="+str(event.pos[0]-600)+"_"+str(event.pos[1]-768/2))
-                theta=math.atan2(event.pos[0]-600,event.pos[1]-(768/2))
-                cursor=event.pos
-            if event.type == MOUSEBUTTONDOWN and event.button == 2:
+                if event.pos[0]<rcmp[0] or event.pos[0]>rcmp[0]+82 or event.pos[1]<rcmp[1] or event.pos[1]>rcmp[1]+rcmh:
+                    urllib.urlopen(ip+"/setdst/?username="+login[0]+"&rpos="+str(event.pos[0]-600)+"_"+str(event.pos[1]-768/2))
+                    theta=math.atan2(event.pos[0]-600,event.pos[1]-(768/2))
+                    cursor=event.pos
+                lmb=True
+            if event.type == MOUSEBUTTONDOWN and event.button == 3:
                 rmb=True
             if event.type == MOUSEMOTION:
                 mpos=event.pos
@@ -121,13 +128,16 @@ try:
             
         screen.fill((0,0,0))
         
+        i=0
         for planet in _P:
             _Pp = (int((float(planet[0])*149597870700-pos[0])/50000+600),
             int((float(planet[1])*149597870700-pos[1])/50000+768/2))
             if _Pp[0]**2+_Pp[1]**2 < 25000000:
-                screen.blit(getimg(planet[2]),_Pp)
-                if rmb and (mpos[0]-(_Pp[0]+getimg(planet[2]).get_width()/2))**2 +(mpos[1]-(_Pp[1]+getimg(planet[2]).get_width()/2))**2 < (getimg(planet[2]).get_width()/2)**2:
-                    pass    
+                screen.blit(getimg(planet[2]),(_Pp[0]-getimg(planet[2]).get_width()/2,_Pp[1]-getimg(planet[2]).get_width()/2))
+                if rmb and (mpos[0]-_Pp[0])**2 +(mpos[1]-_Pp[1])**2 < (getimg(planet[2]).get_width()/2)**2:
+                    rcm = "P"+str(i)
+                    rcmp=mpos
+            i+=1
             #print _Pp
         
         screen.blit(heart,(5,5))
@@ -147,7 +157,27 @@ try:
             screen.blit(cs,(cursor[0]-8,cursor[1]-8))
             rotship=pygame.transform.rotate(ships_i[ship],math.degrees(theta+math.pi))
         
+        if rcm=="x":
+            rcmh=0
         
+        if rcm[0]=="P":
+            rcmh=42
+            pygame.draw.rect(screen,(80,80,80),rcmp+(82,42))
+            screen.blit(font.render(_P[int(rcm[1:])][3],True,(255,255,255)),(rcmp[0]+4,rcmp[1]+2))
+            pygame.draw.line(screen,(255,255,255),(rcmp[0]+2,rcmp[1]+18),(rcmp[0]+80,rcmp[1]+18))
+            if mpos[0]>rcmp[0]+2 and mpos[0]<rcmp[0]+76 and mpos[1]>rcmp[1]+22 and mpos[1]<rcmp[1]+42:
+                pygame.draw.rect(screen,(255,255,255),(rcmp[0]+3,rcmp[1]+23,76,16))
+                screen.blit(font.render("Scan",True,(80,80,80)),(rcmp[0]+4,rcmp[1]+22))
+                if lmb:
+                    
+                    if urllib.urlopen(ip+"/scan/?username="+login[0]+"&pid="+rcm[1:]).read():
+                        raise ValueError
+                    rcm="x"
+                    
+            else:
+                screen.blit(font.render("Scan",True,(255,255,255)),(rcmp[0]+4,rcmp[1]+22))
+                
+                
         pygame.display.update()
         
     
